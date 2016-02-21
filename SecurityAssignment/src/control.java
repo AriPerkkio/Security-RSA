@@ -6,6 +6,9 @@ public class control {
 	
 	public static void main(String[] args) {
 		
+		long startTime = System.nanoTime();
+		
+		
 		// Generate two 128-bit prime numbers
 		PrimeNumber p = new PrimeNumber();
 		PrimeNumber q = new PrimeNumber();
@@ -66,6 +69,11 @@ public class control {
 			decrypted[ii] = encrypted[ii].modPow(d, n);
 			System.out.print(""+ ((char) decrypted[ii].intValue()));
 		}
+		
+		long endTime = System.nanoTime();
+
+		long duration = (endTime - startTime)/1000000;  //divide by 1000000 to get milliseconds.
+		System.out.println("\n\nDuration: "+duration+" ms");
 		System.exit(0); 
 	}
 	
