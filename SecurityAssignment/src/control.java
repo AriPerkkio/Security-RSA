@@ -7,73 +7,36 @@ public class control {
 	public static void main(String[] args) {
 		
 		long startTime = System.nanoTime();
-		
+		String secretMessage = "This is my secret message which will be encrypted.";
 		
 		// Generate two 128-bit prime numbers
 		PrimeNumber p = new PrimeNumber();
 		PrimeNumber q = new PrimeNumber();
 		
-		// Calculate n = pq
-		BigInteger n = q.getValue().multiply(p.getValue());
-		
-		// Pick another number e such that e and (p-1)(q-1) are relatively prime.
-		// F = (p-1)(q-1)
-		BigInteger f = q.getValue().subtract(BigInteger.ONE).multiply
-					  (p.getValue().subtract(BigInteger.ONE));		
-		BigInteger e = new BigInteger(f.toString(2).length()-1, PrimeNumber.random);
-		BigInteger i = BigInteger.ZERO;
-		do{
-			e = e.add(BigInteger.ONE);
-			i = calcGcd(f, e)[0];
-			
-		}while(!i.equals(BigInteger.ONE));
-	
-		// Calculate d such that ed = 1 mod (p-1)(q-1)
-		BigInteger d = calcGcd(f, e)[1];
+		BigInteger keys[] = calcKeys(p, q);
 		
 		System.out.println("\n\nFINISHED:\nPublic key, "
-				+n.toString(2).length()+" bits"+
-				"\nN: "+n+
-				"\nPublic Exponent, "+e.toString(2).length()+" bits"+"\nE:"+e);
-		System.out.println("Private key: \nD:"+d + " "+
-		d.toString(2).length()+" bits");
+				+keys[0].toString(2).length()+" bits"+
+				"\nN: "+keys[0]+
+				"\nPublic Exponent, "+keys[1].toString(2).length()+" bits"+"\nE:"+keys[1]);
+		System.out.println("Private key, "+ keys[2].toString(2).length()+" bits"+
+				" \nD:"+keys[2] );		
+
+		BigInteger encryptedMessage[] = encrypt(secretMessage, keys[0], keys[1]);
 		
-		
-		// Encrypt message m via c = m^e mod n
-		// Decrypt the ciphertext c via m = cd mod n
-
-		int message[] = new int[]{
-				(int) (new Character('M')),
-				(int) (new Character('y')),
-				(int) (new Character(' ')),
-				(int) (new Character('M')),
-				(int) (new Character('e')),
-				(int) (new Character('s')),
-				(int) (new Character('s')),
-				(int) (new Character('a')),
-				(int) (new Character('g')),
-				(int) (new Character('e'))};
-
-		BigInteger encrypted[] = new BigInteger[message.length];
-		BigInteger decrypted[] = new BigInteger[message.length];
-
-		System.out.println("\nEncrypted message: ");
-		for(int ii=0;ii<message.length;ii++){
-			encrypted[ii] = new BigInteger(""+message[ii]).modPow(e, n);
-			System.out.print(""+(char) encrypted[ii].intValue());
-		}
+		BigInteger decrypted[] = new BigInteger[encryptedMessage.length];
 		
 		// Decrypt
 		System.out.println("\nPlain text: ");
-		for(int ii=0;ii<message.length;ii++){
-			decrypted[ii] = encrypted[ii].modPow(d, n);
+		for(int ii=0;ii<encryptedMessage.length;ii++){
+			decrypted[ii] = encryptedMessage[ii].modPow(keys[2], keys[0]);
 			System.out.print(""+ ((char) decrypted[ii].intValue()));
 		}
 		
 		long endTime = System.nanoTime();
 
-		long duration = (endTime - startTime)/1000000;  //divide by 1000000 to get milliseconds.
-		System.out.println("\n\nDuration: "+duration+" ms");
+		long duration = (endTime - startTime)/1000000000;  
+		System.out.println("\n\nDuration: "+duration+" s");
 		System.exit(0); 
 	}
 	
@@ -115,7 +78,50 @@ public class control {
 		else
 			returnNumber[1] = yy;	
 		return returnNumber;
-	}	
+	}
+	
+	public static BigInteger[] calcKeys(PrimeNumber _p, PrimeNumber _q){
+		BigInteger returnKeys[] = new BigInteger[3];
+		
+		// Calculate n = pq
+		BigInteger n = _q.getValue().multiply(_p.getValue());
+			
+		// Pick another number e such that e and (p-1)(q-1) are relatively prime.
+		// F = (p-1)(q-1)
+		BigInteger f = _q.getValue().subtract(BigInteger.ONE).multiply
+							  (_p.getValue().subtract(BigInteger.ONE));		
+		BigInteger e = new BigInteger(f.toString(2).length()-1, PrimeNumber.random);
+		BigInteger i = BigInteger.ZERO;
+		do{
+				e = e.add(BigInteger.ONE);
+				i = calcGcd(f, e)[0];		
+		}while(!i.equals(BigInteger.ONE));
+			
+		// Calculate d such that ed = 1 mod (p-1)(q-1)
+		BigInteger d = calcGcd(f, e)[1];
+		
+		returnKeys[0] = n; // Public key
+		returnKeys[1] = e; // Public exponent
+		returnKeys[2] = d; // Private key
+		
+		return returnKeys;
+	}
+	
+	public static BigInteger[] encrypt(String _message, BigInteger publicKey, BigInteger publicExponent){
+		
+		BigInteger encrypted[] = new BigInteger[_message.length()];
+		int message[] = new int[_message.length()];
+		
+		for(int i=0;i<_message.length();i++)
+			message[i] = ((int) _message.charAt(i));
+		
+		System.out.println("\nEncrypted message: ");
+		for(int i=0;i<message.length;i++){
+			encrypted[i] = new BigInteger(""+message[i]).modPow(publicExponent, publicKey);
+			System.out.print(""+(char) encrypted[i].intValue());
+		}	
+		return encrypted;
+	}
 	
 }
 

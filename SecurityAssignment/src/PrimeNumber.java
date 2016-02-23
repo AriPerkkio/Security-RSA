@@ -1,14 +1,14 @@
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-public class PrimeNumber {
+public class PrimeNumber{
 	
 	private final BigInteger TWO = new BigInteger("2");
-	public int bitCount = 128;
+	public int bitCount = 40; // Using 60-bits since 128-bits is too slow.
+							  // 60-bits is about 80 seconds
 
 	public static SecureRandom random = new SecureRandom();
 	private BigInteger value = new BigInteger(bitCount, random);
-	public boolean TESTING = false;
 	
 	
 	public PrimeNumber(){
@@ -18,6 +18,7 @@ public class PrimeNumber {
 			System.out.println("Calculating prime number, round #"+i);
 			value = new BigInteger(bitCount, random);
 		}while(!this.isPrime());
+		//}while(!this.value.isProbablePrime(100));
 	}
 	
 	// Faster way to calculate if prime, not just square..
@@ -33,9 +34,9 @@ public class PrimeNumber {
 			return false;
 
 		System.out.println("Starting for loops from 3 to "+square);
-		for(BigInteger i = new BigInteger("3"); // 
+		for(BigInteger i = new BigInteger("3"); // Above two 
 			i.compareTo(square)==-1; // Smaller than square root
-				i=i.add(TWO)){ // Skip even numbers 
+			i=i.add(TWO)){ // Skip even numbers 
 				if(this.value.remainder(i).equals(BigInteger.ZERO)){
 					System.out.println("False at i "+i+"\n\n");
 					return false;
@@ -67,7 +68,6 @@ public class PrimeNumber {
 	        result = result.multiply(n);
 	        n = n.subtract(BigInteger.ONE);
 	    }
-
 	    return result;
 	}
 	
