@@ -1,43 +1,94 @@
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.logging.Logger;
+import java.awt.Graphics;
 
-public class control {
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+
+public class control extends JFrame{
+	
+    public control(String _text, String panel){
+        super(_text);
+
+
+        switch(panel){
+        	case "default":
+        		setContentPane(new DrawPane());
+        	break;
+        	
+        	case "encrypt":
+        		setContentPane(new DrawEncrypt());
+        	break;
+        	
+        }
+        
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        setSize(400, 400);
+
+        setVisible(true); 
+   }
+
+    //create a component that you can actually draw on.
+    class DrawPane extends JPanel{
+      public void paintComponent(Graphics g){
+        //draw on g here e.g.
+         g.fillRect(0,0,400,400);
+       }
+   }
+    
+    class DrawEncrypt extends JPanel{
+        public void paintComponent(Graphics g){
+          
+           
+         }
+     }
 	
 	public static void main(String[] args) {
 		
+		new control("RSA Keys", "default");
+		new control("Encrypt", "encrypt");
+		new control("Decrypt", "default");
+		
 		long startTime = System.nanoTime();
 		String secretMessage = "This is my secret message which will be encrypted.";
+		int bitCount = 32;
 		
 		// Generate two 128-bit prime numbers
-		PrimeNumber p = new PrimeNumber();
-		PrimeNumber q = new PrimeNumber();
+		PrimeNumber p = new PrimeNumber(bitCount);
+		PrimeNumber q = new PrimeNumber(bitCount);
 		
-		BigInteger keys[] = calcKeys(p, q);
+		// keys[0]: Public, keys[1]: Exponent, keys[2]: Private
+		BigInteger keys[] = calcKeys(p, q);	
+		// Encrypt message using public key and exponent
+		BigInteger encryptedMessage[] = encrypt(secretMessage, keys[0], keys[1]);
+		// Decrypt message using public key and private key
+		BigInteger decryptedMessage[] = decrypt(encryptedMessage, keys[0], keys[2]);
 		
+		System.out.println("\nEncrypted message:");
+		for(int i=0;i<encryptedMessage.length;i++){
+			System.out.print(""+(char) encryptedMessage[i].intValue());
+		}
+		System.out.println("\nDecrypted message:");		
+		for(int i=0;i<decryptedMessage.length;i++){
+			System.out.print(""+ ((char) decryptedMessage[i].intValue()));			
+		}
+		
+
 		System.out.println("\n\nFINISHED:\nPublic key, "
 				+keys[0].toString(2).length()+" bits"+
 				"\nN: "+keys[0]+
 				"\nPublic Exponent, "+keys[1].toString(2).length()+" bits"+"\nE:"+keys[1]);
 		System.out.println("Private key, "+ keys[2].toString(2).length()+" bits"+
-				" \nD:"+keys[2] );		
-
-		BigInteger encryptedMessage[] = encrypt(secretMessage, keys[0], keys[1]);
-		
-		BigInteger decrypted[] = new BigInteger[encryptedMessage.length];
-		
-		// Decrypt
-		System.out.println("\nPlain text: ");
-		for(int ii=0;ii<encryptedMessage.length;ii++){
-			decrypted[ii] = encryptedMessage[ii].modPow(keys[2], keys[0]);
-			System.out.print(""+ ((char) decrypted[ii].intValue()));
-		}
+				" \nD:"+keys[2] );	
 		
 		long endTime = System.nanoTime();
-
 		long duration = (endTime - startTime)/1000000000;  
 		System.out.println("\n\nDuration: "+duration+" s");
-		System.exit(0); 
+		//System.exit(0); 
 	}
 	
 	// Returns: [0] = gcd - [1] = factor for y
@@ -115,12 +166,20 @@ public class control {
 		for(int i=0;i<_message.length();i++)
 			message[i] = ((int) _message.charAt(i));
 		
-		System.out.println("\nEncrypted message: ");
 		for(int i=0;i<message.length;i++){
 			encrypted[i] = new BigInteger(""+message[i]).modPow(publicExponent, publicKey);
-			System.out.print(""+(char) encrypted[i].intValue());
 		}	
 		return encrypted;
+	}
+	
+	public static BigInteger[] decrypt(BigInteger[] _encryptedMessage, BigInteger publicKey, BigInteger privateKey){
+		
+		BigInteger decrypted[] = new BigInteger[_encryptedMessage.length];
+
+		for(int i=0;i<_encryptedMessage.length;i++){
+			decrypted[i] = _encryptedMessage[i].modPow(privateKey, publicKey);
+		}
+		return decrypted;	
 	}
 	
 }
