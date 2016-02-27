@@ -16,16 +16,29 @@ import javax.swing.JTextField;
 
 public class control extends JFrame{
 	
+	static BigInteger keys[] = new BigInteger[3];
+	static BigInteger encryptedMessage[] = new BigInteger[500];
+
+	// Window #1 for generating keys 	
     static final JButton btnGetKeys = new JButton("Generate keys");
     static final JTextField publicKeyText = new JTextField("Public key: ");
     static final JTextField exponentText = new JTextField("Exponent: ");
     static final JTextField privateKeyText = new JTextField("Private key:");
 	
+    // Window #2 for encrypting message	
     static final JButton btnEncrypt = new JButton("Encrypt message");
-    static final JTextField inputMessage = new JTextField("Write your message");
+    static final JTextField publicKeyTextTwo = new JTextField("Public key: ");
+    static final JTextField exponentTextTwo = new JTextField("Exponent: ");
+    static final JTextField inputMessageText = new JTextField("Write your message");
+    static final JTextField encryptedMessageText = new JTextField("<Encrypted message>");
     
+    // Window #3 for decrypting message	    
     static final JButton btnDecrypt = new JButton("Decrypt message");
-
+    static final JTextField privateKeyTextTwo = new JTextField("Private key:");
+    static final JTextField publicKeyTextThree = new JTextField("Public key: ");
+    static final JTextField inputMessageTextTwo = new JTextField("<Your message>");
+    static final JTextField encryptedMessageTextTwo = new JTextField("<Encrypted message>");
+    static final JTextField decryptedMessageText = new JTextField("<Encrypted message>");
     
 
     public static class RSAKeys extends JPanel{
@@ -37,29 +50,56 @@ public class control extends JFrame{
 	    }
 	    
       @Override
-      public void paintComponent(Graphics g){  	        	    
+      public void paintComponent(Graphics g){  	    
+    	  	btnGetKeys.setBounds(100,60,100,30);
+  			btnGetKeys.setSize(new Dimension(200, 50));
+  		
     	    btnGetKeys.addActionListener(new ActionListener(){
     	    	public void actionPerformed(ActionEvent e) {
     	    		publicKeyText.setBounds(0, 160, 0, 30);
     	    		publicKeyText.setSize(400, 30);
     	    		RSAKeys.instance.add(publicKeyText);
-    	    		
-    	    	    
+    	    			    	    
     	    	    exponentText.setBounds(0, 200, 0, 30);
     	    	    exponentText.setSize(400, 30);
     	    	    RSAKeys.instance.add(exponentText);
     	    	    
-    	    	    privateKeyText.setBounds(0, 250, 0, 30);
+    	    	    privateKeyText.setBounds(0, 240, 0, 30);
     	    	    privateKeyText.setSize(400, 30);
     	    	    RSAKeys.instance.add(privateKeyText);
     	    		
     	    		int bitCount = 30;
     	    		PrimeNumber p = new PrimeNumber(bitCount);
     	    		PrimeNumber q = new PrimeNumber(bitCount);
-    	    		BigInteger keys[] = calcKeys(p, q);	
+    	    		keys = calcKeys(p, q);	
     	    		publicKeyText.setText("Public key ("+keys[0].toString(2).length()+" bits) : "+keys[0]);
     	    		exponentText.setText("Exponent ("+keys[1].toString(2).length()+" bits): "+keys[1]);
     	    		privateKeyText.setText("Private key ("+keys[2].toString(2).length()+" bits) : "+keys[2]);
+    	    		
+    	    		publicKeyTextTwo.setBounds(0, 160, 0, 30);
+    	    		publicKeyTextTwo.setSize(400, 30);
+    	    		publicKeyTextTwo.setText("Public key ("+keys[0].toString(2).length()+" bits) : "+keys[0]);
+    	    		Encrypt.instance.add(publicKeyTextTwo);
+    	    		
+    	    		exponentTextTwo.setBounds(0, 200, 0, 30);
+    	    		exponentTextTwo.setSize(400, 30);
+    	    		exponentTextTwo.setText("Exponent ("+keys[1].toString(2).length()+" bits): "+keys[1]);
+    	    		Encrypt.instance.add(exponentTextTwo);
+    	    		
+    	    		inputMessageText.setBounds(0, 240, 0, 30);
+    	    		inputMessageText.setSize(400, 30);
+    	    		Encrypt.instance.add(inputMessageText);
+    	    		
+    	    		privateKeyTextTwo.setBounds(0, 160, 0, 30);
+    	    		privateKeyTextTwo.setSize(400, 30);
+    	    		privateKeyTextTwo.setText("Private key ("+keys[2].toString(2).length()+" bits) : "+keys[2]);
+    	    		Decrypt.instance.add(privateKeyTextTwo);
+    	    		
+    	    		publicKeyTextThree.setBounds(0, 200, 0, 30);
+    	    		publicKeyTextThree.setSize(400, 30);
+    	    		publicKeyTextThree.setText("Public key ("+keys[0].toString(2).length()+" bits) : "+keys[0]);
+    	    		Decrypt.instance.add(publicKeyTextThree);
+    	    		
     	    	}});
     	    this.add(btnGetKeys);
        }
@@ -76,18 +116,55 @@ public class control extends JFrame{
     	@Override
         public void paintComponent(Graphics g){
     	    
-    		
     		btnEncrypt.setBounds(100,60,100,30);
     	    btnEncrypt.setSize(new Dimension(200, 50));
+    	    btnEncrypt.addActionListener(new ActionListener(){
+    	    	public void actionPerformed(ActionEvent e) {
+    	    		encryptedMessageText.setBounds(0, 280, 0, 30);
+    	    		encryptedMessageText.setSize(400, 30);
+    	    		encryptedMessage = encrypt(inputMessageText.getText(), keys[0], keys[1]);
+    	    		String encryptedMessageString = "";
+    	    		for(int i=0;i<encryptedMessage.length;i++){
+    	    			encryptedMessageString += (char) encryptedMessage[i].intValue();
+    	    		}
+    	    		encryptedMessageText.setText(encryptedMessageString);
+    	    	    Encrypt.instance.add(encryptedMessageText);
+    	    	    
+    	    		encryptedMessageTextTwo.setBounds(0, 240, 0, 30);
+    	    		encryptedMessageTextTwo.setSize(400, 30);
+    	    		encryptedMessageTextTwo.setText(encryptedMessageString);
+    	    	    Decrypt.instance.add(encryptedMessageTextTwo);
+    	    	}
+    	    }); 
     	    this.add(btnEncrypt);
     	    
         }
     }
-    class Decrypt extends JPanel{
+    static class Decrypt extends JPanel{
+    	
+    	static Decrypt instance;
+    	public Decrypt(){
+    		instance = this;
+    	}
     	@Override
         public void paintComponent(Graphics g){
         	btnDecrypt.setBounds(100,60,100,30);
         	btnDecrypt.setSize(new Dimension(200, 50));
+        	btnDecrypt.addActionListener(new ActionListener(){
+     	    	public void actionPerformed(ActionEvent e) {
+     	    		decryptedMessageText.setBounds(0, 280, 0, 30);
+     	    		decryptedMessageText.setSize(400, 30);
+     	    		BigInteger decryptedMessage[] = decrypt(encryptedMessage, keys[0], keys[2]);
+     	    		String decryptedMessageString = "";
+     	    		for(int i=0;i<decryptedMessage.length;i++){
+     	    			decryptedMessageString+= ((char) decryptedMessage[i].intValue());			
+     	    		}
+     	    		decryptedMessageText.setText(decryptedMessageString);
+     	    		Decrypt.instance.add(decryptedMessageText);
+     	   		
+     	    	}
+     	    });
+     	    	
     	    this.add(btnDecrypt);
         }        
     }
@@ -130,44 +207,6 @@ public class control extends JFrame{
 	             System.exit(0);
 	          }        
 	       });    
-	 	/*
-		long startTime = System.nanoTime();
-		String secretMessage = "This is my secret message which will be encrypted.";
-		int bitCount = 32;
-		
-		// Generate two 128-bit prime numbers
-		PrimeNumber p = new PrimeNumber(bitCount);
-		PrimeNumber q = new PrimeNumber(bitCount);
-		
-		// keys[0]: Public, keys[1]: Exponent, keys[2]: Private
-		BigInteger keys[] = calcKeys(p, q);	
-		// Encrypt message using public key and exponent
-		BigInteger encryptedMessage[] = encrypt(secretMessage, keys[0], keys[1]);
-		// Decrypt message using public key and private key
-		BigInteger decryptedMessage[] = decrypt(encryptedMessage, keys[0], keys[2]);
-		
-		System.out.println("\nEncrypted message:");
-		for(int i=0;i<encryptedMessage.length;i++){
-			System.out.print(""+(char) encryptedMessage[i].intValue());
-		}
-		System.out.println("\nDecrypted message:");		
-		for(int i=0;i<decryptedMessage.length;i++){
-			System.out.print(""+ ((char) decryptedMessage[i].intValue()));			
-		}
-		
-
-		System.out.println("\n\nFINISHED:\nPublic key, "
-				+keys[0].toString(2).length()+" bits"+
-				"\nN: "+keys[0]+
-				"\nPublic Exponent, "+keys[1].toString(2).length()+" bits"+"\nE:"+keys[1]);
-		System.out.println("Private key, "+ keys[2].toString(2).length()+" bits"+
-				" \nD:"+keys[2] );	
-		
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime)/1000000000;  
-		System.out.println("\n\nDuration: "+duration+" s");
-		//System.exit(0); 
-	*/
 	}
 	
 	// Returns: [0] = gcd - [1] = factor for y
