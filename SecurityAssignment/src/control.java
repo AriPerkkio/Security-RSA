@@ -17,10 +17,11 @@ import javax.swing.JTextField;
 public class control extends JFrame{
 	
 	static BigInteger keys[] = new BigInteger[3];
-	static BigInteger encryptedMessage[] = new BigInteger[500];
+	static BigInteger encryptedMessage[] = new BigInteger[5000];
 
 	// Window #1 for generating keys 	
     static final JButton btnGetKeys = new JButton("Generate keys");
+    static final JTextField bitCountText = new JTextField("Bit count");
     static final JTextField publicKeyText = new JTextField("Public key: ");
     static final JTextField exponentText = new JTextField("Exponent: ");
     static final JTextField privateKeyText = new JTextField("Private key:");
@@ -53,7 +54,8 @@ public class control extends JFrame{
       public void paintComponent(Graphics g){  	    
     	  	btnGetKeys.setBounds(100,60,100,30);
   			btnGetKeys.setSize(new Dimension(200, 50));
-  		
+  			bitCountText.setBounds(100,0,100,20);
+  			RSAKeys.instance.add(bitCountText);
     	    btnGetKeys.addActionListener(new ActionListener(){
     	    	public void actionPerformed(ActionEvent e) {
     	    		publicKeyText.setBounds(0, 160, 0, 30);
@@ -68,7 +70,7 @@ public class control extends JFrame{
     	    	    privateKeyText.setSize(400, 30);
     	    	    RSAKeys.instance.add(privateKeyText);
     	    		
-    	    		int bitCount = 30;
+    	    		int bitCount = Integer.parseInt(bitCountText.getText());
     	    		PrimeNumber p = new PrimeNumber(bitCount);
     	    		PrimeNumber q = new PrimeNumber(bitCount);
     	    		keys = calcKeys(p, q);	
@@ -298,19 +300,8 @@ public class control extends JFrame{
 			decrypted[i] = _encryptedMessage[i].modPow(privateKey, publicKey);
 		}
 		return decrypted;	
-	}
-	
+	}	
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
