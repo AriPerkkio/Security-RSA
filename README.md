@@ -1,4 +1,7 @@
 # Security-RSA
+
+![GUI](https://github.com/AriPerkkio/Security-RSA/blob/master/GUI.png)
+
 Security Assignment, Implementing 128-bit RSA with prime number and extended Euclidean calculations
 
 In this assignment, you are required to write a program in C++/ JAVA( any programming language) to implement the RSA algorithm.
