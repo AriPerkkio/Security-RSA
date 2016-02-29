@@ -17,6 +17,7 @@ import java.lang.reflect.Array;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -32,6 +33,7 @@ public class control extends JFrame{
 
 	// Window #1 for generating keys 	
     static final JButton btnGetKeys = new JButton("Generate keys");
+    static final JLabel labelBitcount = new JLabel("Bit count:");
     static final JTextField bitCountText = new JTextField("30");
     static final JTextField publicKeyText = new JTextField("Public key: ");
     static final JTextField exponentText = new JTextField("Exponent: ");
@@ -60,20 +62,11 @@ public class control extends JFrame{
     
 
     public static class RSAKeys extends JPanel{
-    	
-	    static RSAKeys instance;
+    	static RSAKeys instance;
 
 	    public RSAKeys(){
 	    	instance = this;
-	    }
-	    
-      @Override
-      public void paintComponent(Graphics g){  	    
-    	  	btnGetKeys.setBounds(100,60,100,30);
-  			btnGetKeys.setSize(new Dimension(200, 50));
-  			bitCountText.setBounds(100,0,100,20);
-  			RSAKeys.instance.add(bitCountText);
-    	    btnGetKeys.addActionListener(new ActionListener(){ // Key Generate keys
+	    	btnGetKeys.addActionListener(new ActionListener(){ // Key Generate keys
     	    	public void actionPerformed(ActionEvent e) {
     	    		publicKeyText.setBounds(0, 160, 0, 30);
     	    		publicKeyText.setSize(400, 30);
@@ -91,6 +84,7 @@ public class control extends JFrame{
     	    		PrimeNumber p = new PrimeNumber(bitCount);
     	    		PrimeNumber q = new PrimeNumber(bitCount);
     	    		keys = calcKeys(p, q);	
+
     	    		publicKeyText.setText("Public key ("+keys[0].toString(2).length()+" bits) : "+keys[0]);
     	    		exponentText.setText("Exponent ("+keys[1].toString(2).length()+" bits): "+keys[1]);
     	    		privateKeyText.setText("Private key ("+keys[2].toString(2).length()+" bits) : "+keys[2]);
@@ -111,10 +105,12 @@ public class control extends JFrame{
     	    		
     	    		inputFilePathText.setBounds(0, 400, 0, 30);
     	    		inputFilePathText.setSize(400, 30);
+    	    		inputFilePathText.setText("src/plaintextfile");
     	    		Encrypt.instance.add(inputFilePathText);
     	    		
     	    		outputFilePathText.setBounds(0, 440, 0, 30);
     	    		outputFilePathText.setSize(400, 30);
+    	    		outputFilePathText.setText("src/encryptedfile");
     	    		Encrypt.instance.add(outputFilePathText);
     	    		
     	    		privateKeyTextTwo.setBounds(0, 160, 0, 30);
@@ -128,8 +124,19 @@ public class control extends JFrame{
     	    		Decrypt.instance.add(publicKeyTextThree);
     	    		
     	    	}});
+  			RSAKeys.instance.add(bitCountText);
+  			RSAKeys.instance.add(labelBitcount);
     	    this.add(btnGetKeys);
-       }
+    
+	    }
+	    
+      @Override
+      public void paintComponent(Graphics g){  	    
+    	  	btnGetKeys.setBounds(100,60,100,30);
+  			btnGetKeys.setSize(new Dimension(200, 50));
+  			bitCountText.setBounds(100,0,100,20);	
+  			labelBitcount.setBounds(20,0,200,20);
+      }
     }
     
     static class Encrypt extends JPanel{
@@ -137,14 +144,7 @@ public class control extends JFrame{
     	static Encrypt instance;
     	public Encrypt(){
     		instance = this;	
-    	}
-    	
-    	@Override
-        public void paintComponent(Graphics g){
-    	    
-    		btnEncrypt.setBounds(100,60,100,30);
-    	    btnEncrypt.setSize(new Dimension(200, 50));
-    	    btnEncrypt.addActionListener(new ActionListener(){ // Key Encrypt message
+    		btnEncrypt.addActionListener(new ActionListener(){ // Key Encrypt message
     	    	public void actionPerformed(ActionEvent e) {
     	    		encryptedMessageText.setBounds(0, 280, 0, 30);
     	    		encryptedMessageText.setSize(400, 30);
@@ -162,11 +162,7 @@ public class control extends JFrame{
     	    	    Decrypt.instance.add(encryptedMessageTextTwo);
     	    	}
     	    }); 
-    	    this.add(btnEncrypt);
-    	    
-    	    btnEncryptFile.setBounds(100,340,100,30);
-    	    btnEncryptFile.setSize(new Dimension(200, 50)); 
-    	    btnEncryptFile.addActionListener(new ActionListener(){ // Key Encrypt File
+    		btnEncryptFile.addActionListener(new ActionListener(){ // Key Encrypt File
     	    	public void actionPerformed(ActionEvent e) {
     	    		String inputFileString = "";
     	    		// Read in file content
@@ -208,15 +204,28 @@ public class control extends JFrame{
     				
     	    		inputFilePathTextTwo.setBounds(0, 400, 0, 30);
     	    		inputFilePathTextTwo.setSize(400, 30);
+    	    		inputFilePathTextTwo.setText("src/encryptedfile");
     	    		Decrypt.instance.add(inputFilePathTextTwo);
     	    		outputFilePathTextTwo.setBounds(0, 440, 0, 30);
     	    		outputFilePathTextTwo.setSize(400, 30);
+    	    		outputFilePathTextTwo.setText("src/decryptedfile");
     	    		Decrypt.instance.add(outputFilePathTextTwo);
     	    		
     	    	}
     	    });
-    	    	
     	    this.add(btnEncryptFile);
+    	    this.add(btnEncrypt);  
+    	}
+    	
+    	@Override
+        public void paintComponent(Graphics g){
+    	    
+    		btnEncrypt.setBounds(100,60,100,30);
+    	    btnEncrypt.setSize(new Dimension(200, 50));
+  
+    	    btnEncryptFile.setBounds(100,340,100,30);
+    	    btnEncryptFile.setSize(new Dimension(200, 50)); 	
+
         }
     }
     static class Decrypt extends JPanel{
@@ -224,11 +233,6 @@ public class control extends JFrame{
     	static Decrypt instance;
     	public Decrypt(){
     		instance = this;
-    	}
-    	@Override
-        public void paintComponent(Graphics g){
-        	btnDecrypt.setBounds(100,60,100,30);
-        	btnDecrypt.setSize(new Dimension(200, 50));
         	btnDecrypt.addActionListener(new ActionListener(){ // Key Decrypt message
      	    	public void actionPerformed(ActionEvent e) {
      	    		decryptedMessageText.setBounds(0, 280, 0, 30);
@@ -242,12 +246,7 @@ public class control extends JFrame{
      	    		Decrypt.instance.add(decryptedMessageText);
      	    	}
      	    });
-     	    	
-    	    this.add(btnDecrypt);
-    	    
-    	    btnDecryptFile.setBounds(100,340,100,30);
-    	    btnDecryptFile.setSize(new Dimension(200, 50));
-    	    btnDecryptFile.addActionListener(new ActionListener(){ // Key Decrypt File
+        	btnDecryptFile.addActionListener(new ActionListener(){ // Key Decrypt File
      	    	public void actionPerformed(ActionEvent e) { 
         			String encryptedFileString = "";
     	    		// Read in file content
@@ -294,7 +293,17 @@ public class control extends JFrame{
     				}	
      	    	}
      	    	});
+    	    this.add(btnDecrypt);
     	    this.add(btnDecryptFile);
+    	}
+    	@Override
+        public void paintComponent(Graphics g){
+        	btnDecrypt.setBounds(100,60,100,30);
+        	btnDecrypt.setSize(new Dimension(200, 50));
+  
+    	    btnDecryptFile.setBounds(100,340,100,30);
+    	    btnDecryptFile.setSize(new Dimension(200, 50));
+
         }        
     }
 	

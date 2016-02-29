@@ -15,7 +15,7 @@ public class PrimeNumber{
 		int i = 0;
 		do{
 			i++;
-			//System.out.println("Calculating prime number, round #"+i);
+			System.out.println("Calculating prime number, round #"+i);
 			value = new BigInteger(bitCount, random);
 		}while(!this.isPrime());
 		//}while(!this.value.isProbablePrime(100)); // This one is from BigInteger library. 30s for 2048 bit primes...
@@ -38,7 +38,7 @@ public class PrimeNumber{
 			i.compareTo(square)==-1; // Smaller than square root
 			i=i.add(TWO)){ // Skip even numbers 
 				if(this.value.remainder(i).equals(BigInteger.ZERO)){
-					//System.out.println("False at i "+i+"\n\n");
+					System.out.println("False at i "+i+"\n\n");
 					return false;
 			}
 		}
